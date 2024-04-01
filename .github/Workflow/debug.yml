@@ -1,0 +1,18 @@
+name: Simple Debug Workflow
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Display current directory
+        run: ls -al
