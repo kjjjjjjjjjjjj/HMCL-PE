@@ -1,34 +1,38 @@
 name: Android CI
 
 on:
-  pull_request:
-    branches-ignore:
-      - ''
   push:
-    branches-ignore:
-      - ''
-  workflow_dispatch:
-  
+    branches: [ "main" ]  # Only trigger on main branch
+  pull_request:
+    branches: [ "main" ]  # PRs to main
+  workflow_dispatch:       # Manual trigger allowed
+
 jobs:
   build:
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
+    runs-on: ubuntu-latest # Latest OS
 
-    - name: set up JDK 11
-      uses: actions/setup-java@v1
-      with:
-        java-version: 11
-    
-    - name: Build debug.apk
-      run: |
-        chmod +x gradlew
-        ./gradlew assembleRelease
-        
-    - name : upload apk
-      uses: actions/upload-artifact@v3
-      with:
-        name: app-debug
-        path: HMCLPE/build/outputs/apk/release/*
+    steps:
+      # Step 1: Checkout code with latest actions
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Step 2: Set up JDK 17 (mandatory for modern Android)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # Step 3: Build Release APK
+      - name: Build APK
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease
+
+      # Step 4: Upload APK with wildcard path
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: hmcl-pe-release
+          path: HMCLPE/build/outputs/apk/release/*.apk # Wildcard for any APK
